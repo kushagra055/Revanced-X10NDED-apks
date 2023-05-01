@@ -9,10 +9,10 @@ jobs:
   update-and-install:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
         with:
-          distribution: 'zulu'
+          distribution: 'zulu' # See 'Supported distributions' for available options
           java-version: '17'
       - name: Verify Java version
         run: java -version
@@ -25,7 +25,8 @@ jobs:
           find packages -type f -not -name '*.jar' -not -name '*.apk' -delete
       - name: Download YouTube APK
         run: |
-          curl -sL https://www.apkmirror.com/uploads/?appcategory=youtube | grep -o 'https://.*.apk' | grep -v 'bundle' | xargs curl -o youtube.apk
+          url=$(curl -sL https://www.apkmirror.com/uploads/?appcategory=youtube | grep -o 'https://.*.apk' | grep -v 'bundle')
+          curl -o youtube.apk $url
       - name: Build ROOT and NON ROOT APKs
         run: |
           java -jar packages/revanced-cli-all.jar -a youtube.apk -o revanced_root.apk -m packages/app-release-unsigned.apk -b packages/revanced-patches.jar -e microg-support -e spoof-app-version -e enable-old-quality-layout -e custom-branding-name -e custom-branding-icon-revancify -e custom-branding-icon-mmt -e custom-branding-icon-manual -e custom-branding-icon-afn-red -e custom-branding-icon-afn-blue -c
