@@ -11,16 +11,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Update system packages
-        run: sudo apt-get update && sudo apt-get upgrade -y
+    #  - name: Update system packages
+    #    run: sudo apt-get update && sudo apt-get upgrade -y
       - name: Install Zulu JDK17
         run: |
           sudo apt-get install -y curl
-          curl -L https://cdn.azul.com/zulu/bin/zulu17.28.13-ca-jdk17.0.1-linux_x64.tar.gz -o zulu17.28.13-ca-jdk17.0.1-linux_x64.tar.gz
-          tar -xzf zulu17.28.13-ca-jdk17.0.1-linux_x64.tar.gz
-          export JAVA_HOME=$PWD/zulu17.28.13-ca-jdk17.0.1-linux_x64/bin/java
+          curl -L https://cdn.azul.com/zulu/bin/zulu17.28.13-ca-jdk17.0.1-linux_amd64.tar.gz -o zulu.tar.gz
+
+          sudo tar -xf zulu.tar.gz -C /opt
+
+          sudo ln -s /opt/zulu17.28.13-ca-jdk17.0.1-linux_amd64/bin/java /usr/local/bin/java
       - name: Verify Java version
-        run: $JAVA_HOME -version
+        run: java -version
       - name: Revanced extended pre build packages Download
         run: |
           mkdir -p packages
