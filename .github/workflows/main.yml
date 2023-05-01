@@ -25,8 +25,15 @@ jobs:
           find packages -type f -not -name '*.jar' -not -name '*.apk' -delete
       - name: Download YouTube APK
         run: |
-          curl -sL https://github.com/onyxbits/raccoon4/releases/latest/download/raccoon.jar -o raccoon.jar
-          java -jar raccoon.jar -a com.google.android.youtube -o youtube.apk
+          sudo apt-get update
+          sudo apt-get install -y wget zip
+          wget -q https://framagit.org/tuxicoman/googleplaydownloader/-/jobs/artifacts/master/download?job=master -O googleplaydownloader.zip
+          unzip -q googleplaydownloader.zip
+          cd googleplaydownloader || exit
+          chmod +x googleplaydownloader.py
+          ./googleplaydownloader.py --package com.google.android.youtube --arch all -o youtube.zip
+          unzip -q youtube.zip -d youtube
+          mv youtube/*.apk ../youtube.apk
 
       - name: Build ROOT and NON ROOT APKs
         run: |
