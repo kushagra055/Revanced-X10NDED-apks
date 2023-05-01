@@ -16,10 +16,11 @@ jobs:
       - name: Install Zulu JDK17
         run: |
           sudo apt-get install -y curl
-          curl -L https://cdn.azul.com/zulu/bin/zulu17.28.13-ca-jdk17.0.1-linux_amd64.deb -o zulu17.28.13-ca-jdk17.0.1-linux_amd64.deb
-          sudo dpkg -i zulu17.28.13-ca-jdk17.0.1-linux_amd64.deb
+          curl -L https://cdn.azul.com/zulu/bin/zulu17.28.13-ca-jdk17.0.1-linux_x64.tar.gz -o zulu17.28.13-ca-jdk17.0.1-linux_x64.tar.gz
+          tar -xzf zulu17.28.13-ca-jdk17.0.1-linux_x64.tar.gz
+          export JAVA_HOME=$PWD/zulu17.28.13-ca-jdk17.0.1-linux_x64/bin/java
       - name: Verify Java version
-        run: java -version
+        run: $JAVA_HOME -version
       - name: Revanced extended pre build packages Download
         run: |
           mkdir -p packages
