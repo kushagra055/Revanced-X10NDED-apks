@@ -25,8 +25,10 @@ jobs:
           find packages -type f -not -name '*.jar' -not -name '*.apk' -delete
       - name: Download YouTube APK
         run: |
-          url=$(curl -sL https://www.apkmirror.com/uploads/?appcategory=youtube | grep -o 'https://.*.apk' | grep -v 'bundle')
-          curl -o youtube.apk $url
+          sudo apt-get update && sudo apt-get install -y python3-pip
+          pip3 install gplaydl
+          gplaydl com.google.android.youtube -f apk -o youtube.apk
+
       - name: Build ROOT and NON ROOT APKs
         run: |
           java -jar packages/revanced-cli-all.jar -a youtube.apk -o revanced_root.apk -m packages/app-release-unsigned.apk -b packages/revanced-patches.jar -e microg-support -e spoof-app-version -e enable-old-quality-layout -e custom-branding-name -e custom-branding-icon-revancify -e custom-branding-icon-mmt -e custom-branding-icon-manual -e custom-branding-icon-afn-red -e custom-branding-icon-afn-blue -c
