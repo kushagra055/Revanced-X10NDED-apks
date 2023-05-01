@@ -1,0 +1,47 @@
+name: Revanced X10NDED
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-and-install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Update system packages
+        run: sudo apt-get update && sudo apt-get upgrade -y
+      - name: Install Zulu JDK17
+        run: |
+          sudo apt-get install -y curl
+          curl -L https://cdn.azul.com/zulu/bin/zulu17.28.13-ca-jdk17.0.1-linux_amd64.deb -o zulu17.28.13-ca-jdk17.0.1-linux_amd64.deb
+          sudo dpkg -i zulu17.28.13-ca-jdk17.0.1-linux_amd64.deb
+      - name: Verify Java version
+        run: java -version
+      - name: Revanced extended pre build packages Download
+        run: |
+          mkdir -p packages
+          curl -sL https://github.com/inotia00/revanced-cli/releases/latest/download/revanced-cli-all.jar -o packages/revanced-cli-all.jar
+          curl -sL https://github.com/inotia00/revanced-patches/releases/latest/download/revanced-patches.jar -o packages/revanced-patches.jar
+          curl -sL https://github.com/inotia00/revanced-integrations/releases/latest/download/app-release-unsigned.apk -o packages/app-release-unsigned.apk
+          find packages -type f -not -name '*.jar' -not -name '*.apk' -delete
+      - name: Download YouTube APK
+        run: |
+          curl -sL https://www.apkmirror.com/uploads/?appcategory=youtube | grep -o 'https://.*.apk' | grep -v 'bundle' | xargs curl -o youtube.apk
+      - name: Build ROOT and NON ROOT APKs
+        run: |
+          java -jar packages/revanced-cli-all.jar -a youtube.apk -o revanced_root.apk -m packages/app-release-unsigned.apk -b packages/revanced-patches.jar -e microg-support -e spoof-app-version -e enable-old-quality-layout -e custom-branding-name -e custom-branding-icon-revancify -e custom-branding-icon-mmt -e custom-branding-icon-manual -e custom-branding-icon-afn-red -e custom-branding-icon-afn-blue -c
+          java -jar packages/revanced-cli-all.jar -a youtube.apk -o revanced_non_root.apk -m packages/app-release-unsigned.apk -b packages/revanced-patches.jar -i microg-support -e spoof-app-version -e enable-old-quality-layout -e custom-branding-name -e custom-branding-icon-revancify -e custom-branding-icon-mmt -e custom-branding-icon-manual -e custom-branding-icon-afn-red -e custom-branding-icon-afn-blue -c
+      - name: Create Release with APKs and Information
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ## Revanced APKs
+            *ROOT:* revanced_root.apk
